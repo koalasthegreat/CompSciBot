@@ -81,19 +81,20 @@ async def on_ready():
 # assigns either a bot role or member role to a user when they join 
 @bot.event
 async def on_member_join(member):
-    try:
-        if (member.bot):
-            await member.add_roles(
-                discord.utils.get(member.guild.roles, name=BOT_ROLE),
-                reason="Automatically assigned bot role"
-            )
-        else:
-            await member.add_roles(
-                discord.utils.get(member.guild.roles, name=MEMBER_ROLE),
-                reason="Automatically assigned user role"
-            )
-    except:
-        print("ERROR: Could not assign a role to " + str(member.name))
+    if (AUTOASSIGN_ROLES):
+        try:
+            if (member.bot):
+                await member.add_roles(
+                    discord.utils.get(member.guild.roles, name=BOT_ROLE),
+                    reason="Automatically assigned bot role"
+                )
+            else:
+                await member.add_roles(
+                    discord.utils.get(member.guild.roles, name=MEMBER_ROLE),
+                    reason="Automatically assigned user role"
+                )
+        except:
+            print("ERROR: Could not assign a role to " + str(member.name))
 
 # listens for reactions and adds post if it reaches the threshold
 @bot.event
