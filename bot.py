@@ -130,12 +130,19 @@ This command is only usable by the server owner
 async def _populate(ctx):
     channels = ctx.guild.text_channels
 
+    all_pins = []
+
     for channel in channels:
         pins = await channel.pins()
 
-        for pin in pins.reverse():
-            await add_to_starboard(pin)
-            await asyncio.sleep(5)
+        for pin in pins:
+            all_pins.append(pin)
+
+    all_pins.sort(key=lambda x: x.created_at)
+
+    for pin in all_pins:
+        await add_to_starboard(pin)
+        await asyncio.sleep(5)
 
     print("Population of pins finished")
 
