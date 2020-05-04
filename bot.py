@@ -105,13 +105,26 @@ async def on_reaction_add(reaction, user):
             await add_to_starboard(message)
                 
 # simple ping command
-@bot.command(name='ping')
+@bot.command(name='ping',
+brief="Responds in the called channel",
+description="""
+Responds with 'pong' in the channel this command was invoked from
+"""
+)
 async def _ping(ctx):
     await ctx.send('pong')
     print("pong")
 
 # populates the starboard using the pinned messages of all channels
-@bot.command(name='populate')
+@bot.command(name='populate',
+brief="Populates starboard from channel pins",
+description="""
+Populates the set starboard channel with the pinned 
+messages from all other channels
+
+This command is only usable by the server owner
+"""
+)
 @commands.is_owner()
 async def _populate(ctx):
     channels = ctx.guild.text_channels
