@@ -101,7 +101,7 @@ async def on_reaction_add(reaction, user):
     message = reaction.message
 
     if (reaction.emoji == "⭐"):
-        if (reaction.count == int(THRESHOLD)):
+        if (reaction.count >= int(THRESHOLD)):
             await add_to_starboard(message)
                 
 # simple ping command
