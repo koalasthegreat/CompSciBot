@@ -31,16 +31,22 @@ def construct_starboard_message(message):
 
     title = "**Posted in " + str(channel.name) + ":**"
     link = "\n\n[link to post](" + str(message.jump_url) + ")"
+    field_text = message.content + link
+    if len(field_text) >= 1024:
+        field_text = message.content[:((1024-len(link))-10)] + "..." + link
 
     embed = discord.Embed(type="rich", timestamp=message.created_at)
     embed.set_author(name=author.name, icon_url=author.avatar_url)
-    embed.add_field(name=title, value=message.content + link)
+    embed.add_field(name=title, value=field_text)
 
     attach_text = ""
     for attachment in attachments:
         attach_text += attachment.url + "\n"
     for url in re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\), ]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', message.content):
         attach_text += url + "\n"
+
+    if len(attach_text) > 2000:
+        attach_text = attach_text[:1990] + "..."
         
     return (attach_text, embed)
 
