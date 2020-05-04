@@ -133,7 +133,7 @@ async def _populate(ctx):
     for channel in channels:
         pins = await channel.pins()
 
-        for pin in pins:
+        for pin in pins.reverse():
             await add_to_starboard(pin)
             await asyncio.sleep(5)
 
