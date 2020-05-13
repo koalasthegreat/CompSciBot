@@ -14,7 +14,7 @@ THRESHOLD = os.getenv('THRESHOLD', default=3)
 BOT_ROLE = os.getenv('BOT_ROLE', default="bot")
 MEMBER_ROLE = os.getenv('MEMBER_ROLE', default="member")
 STARBOARD_NAME = os.getenv('STARBOARD_NAME', default="starboard")
-AUTOASSIGN_ROLES = os.getenv('AUTOASSIGN_ROLES', default=True)
+AUTOASSIGN_ROLES = bool(os.getenv('AUTOASSIGN_ROLES', default=True))
 
 # load database connection
 db = dataset.connect('sqlite:///bot.db')
@@ -56,13 +56,13 @@ def check_add_message_to_db(message):
         data = dict(post_id=message.id, user_id=message.author.id, guild_id=message.guild.id, timestamp=message.created_at)
         try:
             table.insert(data)
-            print("Post with id " + str(message.id) + " added to database")
+            print(f"Post with id {message.id} added to database")
             return True
         except:
             print("ERROR: Could not add post to database")
             return False
     else:
-        print("Post with id " + str(message.id) + " already in database")
+        print(f"Post with id {message.id} already in database")
         return False
 
 # a coroutine to add a message to the starboard channel in a server
@@ -77,7 +77,7 @@ async def add_to_starboard(message):
             if (attachment_links != ""):
                 await starboard.send("**Attached links:**\n\n" + str(attachment_links))
     else:
-        print("Ignoring adding post with id " + str(message.id))
+        print(f"Ignoring adding post with id {message.id}")
 
 
 @bot.event
@@ -94,13 +94,15 @@ async def on_member_join(member):
                     discord.utils.get(member.guild.roles, name=BOT_ROLE),
                     reason="Automatically assigned bot role"
                 )
+                print(f"Added bot role {BOT_ROLE} to {member.name}")
             else:
                 await member.add_roles(
                     discord.utils.get(member.guild.roles, name=MEMBER_ROLE),
                     reason="Automatically assigned user role"
                 )
+                print(f"Added user role {MEMBER_ROLE} to {member.name}")
         except:
-            print("ERROR: Could not assign a role to " + str(member.name))
+            print(f"ERROR: Could not assign a role to {member.name}")
 
 # listens for reactions and adds post if it reaches the threshold
 @bot.event
