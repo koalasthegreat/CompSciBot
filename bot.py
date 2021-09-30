@@ -1,12 +1,14 @@
-import os
-import sys
-import re
-import dataset
-import discord
 import asyncio
 import logging
+import os
+import re
+import sys
+
+import dataset
+import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+from sqlalchemy.sql import functions, select
 
 # load values from .env
 load_dotenv()
@@ -195,6 +197,39 @@ async def _populate(ctx):
         await asyncio.sleep(5)
 
     logger.info("Population of pins finished")
+
+
+@bot.command()
+async def randompost(ctx: commands.Context):
+    """Get a random post from the starboard."""
+    posts_table = table.table
+    post = next(
+        db.query(
+            posts_table.select().where(
+                posts_table.c.id.in_(
+                    select(posts_table.c.id).order_by(functions.random()).limit(1)
+                )
+            )
+        )
+    )
+
+    for channel in ctx.guild.channels:
+        if not isinstance(channel, discord.TextChannel):
+            continue
+        try:
+            message = await channel.fetch_message(post["post_id"])
+            break
+        except (discord.NotFound, discord.Forbidden):
+            continue
+    else:
+        ctx.reply(":frowning_face: Seems the message I grabbed couldn't be found.")
+        return
+
+    (attachment_links, embed) = construct_starboard_message(message)
+
+    await ctx.send(embed=embed)
+    if attachment_links != "":
+        await ctx.send("**Attached links:**\n\n" + str(attachment_links))
 
 
 bot.run(TOKEN)
