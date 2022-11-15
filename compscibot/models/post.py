@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from sqlalchemy import BigInteger, Column, DateTime, Integer, select
+from sqlalchemy import BigInteger, Column, DateTime, Integer, Text, select
 
 from compscibot.db import Base, async_session
 
@@ -13,6 +13,9 @@ class Post(Base):
     user_id = Column(BigInteger)
     guild_id = Column(BigInteger)
     timestamp = Column(DateTime)
+    channel_id = Column(BigInteger)
+    content = Column(Text)
+    star_count = Column(Integer)
 
     @classmethod
     async def get_by_post(cls, post_id: int) -> Optional["Post"]:

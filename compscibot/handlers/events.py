@@ -2,7 +2,7 @@ import discord
 
 from compscibot import config
 from compscibot.bot import bot, logger
-from compscibot.utils.starboard import add_to_starboard
+from compscibot.utils.starboard import add_to_starboard, get_reaction_count
 
 
 @bot.event
@@ -41,11 +41,7 @@ async def on_reaction_add(reaction, user):
             f"User with name {user.name} and id {user.id} reacted to {message.id}"
         )
 
-        if reaction.count >= config.THRESHOLD:
-            count = 0
-            async for user in reaction.users():
-                if not user.bot:
-                    count += 1
+        count = await get_reaction_count(reaction)
 
-            if count >= config.THRESHOLD:
-                await add_to_starboard(message)
+        if count >= config.THRESHOLD:
+            await add_to_starboard(message)

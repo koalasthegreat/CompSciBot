@@ -1,6 +1,8 @@
 import re
+from typing import Optional
 
 import discord
+from discord.ext import commands
 
 from compscibot import config
 from compscibot.bot import logger
@@ -73,3 +75,26 @@ async def add_to_starboard(message):
                 await starboard.send("**Attached links:**\n\n" + str(attachment_links))
     else:
         logger.info(f"Ignoring adding post with id {message.id}")
+
+
+async def find_post(post: Post, ctx: commands.Context) -> Optional[discord.Message]:
+    for channel in ctx.guild.channels:
+        if not isinstance(channel, discord.TextChannel):
+            continue
+        try:
+            return await channel.fetch_message(post.post_id)
+        except (discord.NotFound, discord.Forbidden):
+            continue
+        except:
+            raise
+
+    return None
+
+
+async def get_reaction_count(reaction: discord.Reaction) -> int:
+    count = 0
+    async for user in reaction.users():
+        if not user.bot:
+            count += 1
+
+    return count
