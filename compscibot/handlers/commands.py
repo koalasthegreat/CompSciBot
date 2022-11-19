@@ -67,7 +67,9 @@ async def filldata(ctx):
     """Populate the data for starboard posts with data from Discord"""
     async with async_session() as session:
         async with session.begin():
-            result = await session.execute(select(Post).filter(Post.content == None).order_by(Post.timestamp.asc()))
+            result = await session.execute(
+                select(Post).filter(Post.content == None).order_by(Post.timestamp.asc())
+            )
             posts = result.scalars().all()
 
             for post in posts:
@@ -81,8 +83,14 @@ async def filldata(ctx):
                 content = message.content
                 channel_id = message.channel.id
 
-                reactions_obj = next((r for r in message.reactions if r.emoji == "⭐"), None)
-                star_count = await get_reaction_count(reactions_obj) if reactions_obj is not None else 0
+                reactions_obj = next(
+                    (r for r in message.reactions if r.emoji == "⭐"), None
+                )
+                star_count = (
+                    await get_reaction_count(reactions_obj)
+                    if reactions_obj is not None
+                    else 0
+                )
 
                 async with session.begin_nested():
                     await session.execute(
@@ -97,7 +105,6 @@ async def filldata(ctx):
 
                 logger.info(f"Populated data for post {post.id}")
             await session.commit()
-
 
 
 @bot.command()

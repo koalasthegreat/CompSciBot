@@ -51,7 +51,7 @@ async def check_add_message_to_db(message, star_count):
                 timestamp=message.created_at,
                 content=message.content,
                 channel_id=message.channel.id,
-                star_count=star_count
+                star_count=star_count,
             )
             logger.info(f"Post with id {message.id} added to database")
             return True
@@ -64,7 +64,7 @@ async def check_add_message_to_db(message, star_count):
 
 
 # a coroutine to add a message to the starboard channel in a server
-async def add_to_starboard(message, star_count = 0):
+async def add_to_starboard(message, star_count=0):
     if message.channel.name != config.STARBOARD_NAME:
         if await check_add_message_to_db(message, star_count):
             starboard = discord.utils.get(
