@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from sqlalchemy import BigInteger, Column, DateTime, Integer, Text, select
+from sqlalchemy import BigInteger, Column, DateTime, Integer, Text, select, update
 
 from compscibot.db import Base, async_session
 
@@ -34,3 +34,15 @@ class Post(Base):
                 await session.commit()
 
         return instance
+
+    @classmethod
+    async def update_star_count(cls, post_id: int, star_count: int) -> None:
+        async with async_session() as session:
+            async with session.begin():
+                await session.execute(
+                    update(Post)
+                    .where(Post.post_id == post_id)
+                    .values(
+                        star_count=star_count,
+                    )
+                )

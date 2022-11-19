@@ -2,6 +2,7 @@ import discord
 
 from compscibot import config
 from compscibot.bot import bot, logger
+from compscibot.models import Post
 from compscibot.utils.starboard import add_to_starboard, get_reaction_count
 
 
@@ -42,6 +43,7 @@ async def on_reaction_add(reaction, user):
         )
 
         count = await get_reaction_count(reaction)
+        await Post.update_star_count(message.id, count)
 
         if count >= config.THRESHOLD:
-            await add_to_starboard(message)
+            await add_to_starboard(message, count)
