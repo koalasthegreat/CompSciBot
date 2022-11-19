@@ -1,6 +1,8 @@
 import re
+from typing import Optional
 
 import discord
+from discord.ext import commands
 
 from compscibot import config
 from compscibot.bot import logger
@@ -39,7 +41,7 @@ def construct_starboard_message(message):
 
 
 # adds a message to the db if it does not already exist, returns true if success, false otherwise
-async def check_add_message_to_db(message):
+async def check_add_message_to_db(message, star_count):
     if await Post.get_by_post(post_id=message.id) is None:
         try:
             await Post.add(
@@ -47,6 +49,9 @@ async def check_add_message_to_db(message):
                 user_id=message.author.id,
                 guild_id=message.guild.id,
                 timestamp=message.created_at,
+                content=message.content,
+                channel_id=message.channel.id,
+                star_count=star_count,
             )
             logger.info(f"Post with id {message.id} added to database")
             return True
@@ -59,9 +64,9 @@ async def check_add_message_to_db(message):
 
 
 # a coroutine to add a message to the starboard channel in a server
-async def add_to_starboard(message):
+async def add_to_starboard(message, star_count=0):
     if message.channel.name != config.STARBOARD_NAME:
-        if await check_add_message_to_db(message):
+        if await check_add_message_to_db(message, star_count):
             starboard = discord.utils.get(
                 message.guild.text_channels, name=config.STARBOARD_NAME
             )
@@ -73,3 +78,26 @@ async def add_to_starboard(message):
                 await starboard.send("**Attached links:**\n\n" + str(attachment_links))
     else:
         logger.info(f"Ignoring adding post with id {message.id}")
+
+
+async def find_post(post: Post, ctx: commands.Context) -> Optional[discord.Message]:
+    for channel in ctx.guild.channels:
+        if not isinstance(channel, discord.TextChannel):
+            continue
+        try:
+            return await channel.fetch_message(post.post_id)
+        except (discord.NotFound, discord.Forbidden):
+            continue
+        except:
+            raise
+
+    return None
+
+
+async def get_reaction_count(reaction: discord.Reaction) -> int:
+    count = 0
+    async for user in reaction.users():
+        if not user.bot:
+            count += 1
+
+    return count
