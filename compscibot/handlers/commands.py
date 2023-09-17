@@ -125,3 +125,10 @@ async def randompost(ctx: commands.Context):
     await ctx.send(embed=embed)
     if attachment_links != "":
         await ctx.send("**Attached links:**\n\n" + str(attachment_links))
+
+
+@bot.command()
+async def database(ctx: commands.Context):
+    """Get a copy of the bot database."""
+
+    await ctx.send(file=discord.File("bot.db"))
