@@ -72,9 +72,7 @@ async def randompost(ctx: commands.Context):
         except (discord.NotFound, discord.Forbidden):
             continue
     else:
-        await ctx.reply(
-            ":frowning: Seems the message I grabbed couldn't be found."
-        )
+        await ctx.reply(":frowning: Seems the message I grabbed couldn't be found.")
         return
 
     (attachment_links, embed) = construct_starboard_message(message)
@@ -82,3 +80,10 @@ async def randompost(ctx: commands.Context):
     await ctx.send(embed=embed)
     if attachment_links != "":
         await ctx.send("**Attached links:**\n\n" + str(attachment_links))
+
+
+@bot.command()
+async def database(ctx: commands.Context):
+    """Get a copy of the bot database."""
+
+    await ctx.send(file=discord.File("bot.db"))

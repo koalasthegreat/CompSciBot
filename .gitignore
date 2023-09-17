@@ -1,6 +1,8 @@
 .env
+venv
 .vscode
 .idea
 *.db
 *.log
 .python-version
+__pycache__
