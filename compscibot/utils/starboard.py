@@ -10,7 +10,7 @@ from compscibot.models import Post
 
 
 # creates and formats the message to be sent to a starboard
-def construct_starboard_message(message):
+async def construct_starboard_message(message):
     author = message.author
     channel = message.channel
     attachments = message.attachments
@@ -25,9 +25,10 @@ def construct_starboard_message(message):
     embed.set_author(name=author.name, icon_url=author.display_avatar.url)
     embed.add_field(name=title, value=field_text)
 
+    files = [await attachment.to_file() for attachment in attachments]
+
     attach_text = ""
-    for attachment in attachments:
-        attach_text += attachment.url + "\n"
+
     for url in re.findall(
         "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\), ]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
         message.content,
@@ -37,7 +38,7 @@ def construct_starboard_message(message):
     if len(attach_text) > 2000:
         attach_text = attach_text[:1990] + "..."
 
-    return (attach_text, embed)
+    return (attach_text, embed, files)
 
 
 # adds a message to the db if it does not already exist, returns true if success, false otherwise
@@ -71,9 +72,13 @@ async def add_to_starboard(message, star_count=0):
                 message.guild.text_channels, name=config.STARBOARD_NAME
             )
 
-            (attachment_links, embed) = construct_starboard_message(message)
+            (attachment_links, embed, files) = await construct_starboard_message(message)
 
             await starboard.send(embed=embed)
+
+            if (len(files) > 0):
+                await starboard.send(files=files)
+                
             if attachment_links != "":
                 await starboard.send("**Attached links:**\n\n" + str(attachment_links))
     else:

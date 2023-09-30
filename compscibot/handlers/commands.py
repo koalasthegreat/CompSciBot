@@ -120,9 +120,13 @@ async def randompost(ctx: commands.Context):
         await ctx.reply(":frowning: Seems the message I grabbed couldn't be found.")
         return
 
-    (attachment_links, embed) = construct_starboard_message(message)
+    (attachment_links, embed, files) = await construct_starboard_message(message)
 
     await ctx.send(embed=embed)
+
+    if len(files) > 0:
+        await ctx.send(files=files)
+
     if attachment_links != "":
         await ctx.send("**Attached links:**\n\n" + str(attachment_links))
 
