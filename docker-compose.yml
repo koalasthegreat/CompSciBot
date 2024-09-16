@@ -1,0 +1,11 @@
+version: "1"
+services:
+  compscibot:
+    container_name: compscibot
+    image: compscibot
+    volumes:
+      - compscibot-data:/run/data
+    restart: always
+
+volumes:
+  compscibot-data:
