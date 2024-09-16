@@ -11,3 +11,4 @@ BOT_ROLE = os.getenv("BOT_ROLE", default="bot")
 MEMBER_ROLE = os.getenv("MEMBER_ROLE", default="member")
 STARBOARD_NAME = os.getenv("STARBOARD_NAME", default="starboard")
 AUTOASSIGN_ROLES = bool(os.getenv("AUTOASSIGN_ROLES", default=True))
+DB_URL = os.getenv("DB_URL", default="/bot.db"),
