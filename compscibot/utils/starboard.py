@@ -25,7 +25,8 @@ async def construct_starboard_message(message):
     embed.set_author(name=author.name, icon_url=author.display_avatar.url)
     embed.add_field(name=title, value=field_text)
 
-    files = [await attachment.to_file() for attachment in attachments]
+    files = [await attachment.to_file(spoiler=attachment.filename.startswith("SPOILER")) for attachment in attachments]
+
 
     attach_text = ""
 
